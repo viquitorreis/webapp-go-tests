@@ -5,3 +5,7 @@ build:
 .PHONY: run
 run: build
 	@./bin/web
+
+.PHONY: test
+test:
+	@go test -v ./...
