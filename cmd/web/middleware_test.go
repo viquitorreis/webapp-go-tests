@@ -39,8 +39,6 @@ func Test_application_addIPToContext(t *testing.T) {
 		t.Log("IP from context: ", ip)
 	})
 
-	var app application
-
 	for _, e := range tests {
 		// vamos criar o handler para testar
 		handlerToTest := app.addIPToContext(nextHandler)
@@ -67,9 +65,6 @@ func Test_application_addIPToContext(t *testing.T) {
 }
 
 func Test_application_ipFromContext(t *testing.T) {
-	// criar um app var do tipo application
-	var app application
-
 	// pegar o context
 	ctx := context.Background()
 

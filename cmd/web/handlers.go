@@ -6,17 +6,25 @@ import (
 	"log"
 	"net/http"
 	"path"
+	"time"
 )
 
 var pathToTemplates = "./templates/"
 
 func (app *application) Home(w http.ResponseWriter, r *http.Request) {
-	data := &TemplateData{
-		Data: map[string]any{
-			"message": "Hello, World!",
-		},
+	// passando dados para o template
+	var td = make(map[string]any)
+
+	if app.Session.Exists(r.Context(), "test") {
+		// pegando o que tem na session
+		msg := app.Session.GetString(r.Context(), "test")
+		// passando para o template
+		td["test"] = msg
+	} else {
+		app.Session.Put(r.Context(), "test", "Hit this page at"+time.Now().UTC().String())
 	}
-	err := app.render(w, r, "home.page.gohtml", data)
+
+	err := app.render(w, r, "home.page.gohtml", &TemplateData{Data: td})
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -29,7 +37,10 @@ type TemplateData struct {
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, data *TemplateData) error {
 	// parse template from disk
-	parsedTemplate, err := template.ParseFiles(path.Join(pathToTemplates, name))
+	parsedTemplate, err := template.ParseFiles(
+		path.Join(pathToTemplates, name),
+		path.Join(pathToTemplates, "base.layout.gohtml"),
+	)
 	if err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return err
