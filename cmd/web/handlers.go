@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"path"
 )
@@ -44,4 +45,31 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, name stri
 	}
 
 	return nil
+}
+
+func (app *application) Login(w http.ResponseWriter, r *http.Request) {
+	// pegando a reqquest num formato que vamos conseguir trabalhar com a form
+	err := r.ParseForm()
+	if err != nil {
+		log.Println("Erro ao passar a form", err)
+		http.Error(w, "Erro", http.StatusBadRequest)
+		return
+	}
+
+	// validando os dados
+	form := NewForm(r.PostForm)
+	form.Required("email", "password")
+
+	if !form.Valid() {
+		fmt.Fprintf(w, "Formulário inválido. Falhou a validação")
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	log.Println("Email: ", email)
+	log.Println("Password: ", password)
+
+	fmt.Fprint(w, email)
 }

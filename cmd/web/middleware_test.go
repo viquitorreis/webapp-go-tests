@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -61,5 +63,24 @@ func Test_application_addIPToContext(t *testing.T) {
 
 		// testando o handler
 		handlerToTest.ServeHTTP(httptest.NewRecorder(), req)
+	}
+}
+
+func Test_application_ipFromContext(t *testing.T) {
+	// criar um app var do tipo application
+	var app application
+
+	// pegar o context
+	ctx := context.Background()
+
+	// colocar um valor no context
+	ctx = context.WithValue(ctx, contextUserKey, "whatever.ip.user.have")
+
+	// chamar a function
+	ip := app.ipFromContext(ctx)
+
+	// performar o teste
+	if !strings.EqualFold(ip, "whatever.ip.user.have") {
+		t.Errorf("Expected: %s, got: %s", "whatever.ip.user.have", ip)
 	}
 }
